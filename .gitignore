@@ -1,6 +1,9 @@
 # ── Credenciales y configuración local ──────────────────────
 .env
 
+# ── Scripts de mantenimiento temporal (nunca a Git) ──────────
+reset_admin.php
+
 # ── Dependencias / paquetes ──────────────────────────────────
 vendor/
 node_modules/
