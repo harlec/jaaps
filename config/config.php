@@ -5,18 +5,20 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/env.php';
+
 // ── Aplicación ───────────────────────────────────────────────
 define('APP_NAME',    'JAAP – Junta Administradora de Agua Potable');
 define('APP_VERSION', '1.0.0');
-define('APP_URL',     'http://localhost/jaaps'); // Cambia según tu entorno
+define('APP_URL',     $_ENV['APP_URL'] ?? 'http://localhost/jaaps');
 
 // ── Sesión ──────────────────────────────────────────────────
 define('SESSION_NAME',      'jaap_session');
 define('SESSION_LIFETIME',  7200); // 2 horas en segundos
 
 // ── API migo.pe – DNI lookup ─────────────────────────────────
-// Coloca aquí tu token de API: https://api.migo.pe/tokens
-define('MIGO_API_TOKEN', $_ENV['MIGO_API_TOKEN'] ?? 'TU_TOKEN_AQUI');
+// El token se lee del archivo .env (ver .env.example)
+define('MIGO_API_TOKEN', $_ENV['MIGO_API_TOKEN'] ?? '');
 define('MIGO_API_URL',   'https://api.migo.pe/api/v1/dni');
 
 // ── Tarifa mensual (S/.) ─────────────────────────────────────

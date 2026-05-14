@@ -6,11 +6,13 @@
 
 declare(strict_types=1);
 
-define('DB_HOST', $_ENV['DB_HOST'] ?? 'localhost');
-define('DB_PORT', $_ENV['DB_PORT'] ?? '3306');
-define('DB_NAME', $_ENV['DB_NAME'] ?? 'jaap');
-define('DB_USER', $_ENV['DB_USER'] ?? 'jaap');
-define('DB_PASS', $_ENV['DB_PASS'] ?? 'A20520929658n');
+require_once __DIR__ . '/env.php';
+
+define('DB_HOST',    $_ENV['DB_HOST']    ?? 'localhost');
+define('DB_PORT',    $_ENV['DB_PORT']    ?? '3306');
+define('DB_NAME',    $_ENV['DB_NAME']    ?? 'jaap');
+define('DB_USER',    $_ENV['DB_USER']    ?? 'jaap_user');
+define('DB_PASS',    $_ENV['DB_PASS']    ?? '');
 define('DB_CHARSET', 'utf8mb4');
 
 function getDB(): PDO
