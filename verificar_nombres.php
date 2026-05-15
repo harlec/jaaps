@@ -161,7 +161,7 @@ $zonaLabel = ['tunas' => 'Tunas', 'cerro_de_pasco' => 'Pasco - Carrizales', 'por
 </div>
 
 <script>
-const API_URL  = '<?= APP_URL ?>/api/dni.php';
+const API_URL    = '/api/dni.php';          // relativo: funciona con http y https
 const UPDATE_URL = window.location.pathname;
 
 let stopRequested = false;
