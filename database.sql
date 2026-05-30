@@ -194,5 +194,5 @@ INSERT INTO `conceptos` (`nombre`, `descripcion`, `monto`, `tipo`) VALUES
 INSERT INTO `periodos_cobro`
   (`nombre`, `anio`, `semestre`, `meses`, `fecha_inicio`, `fecha_fin`, `fecha_vencimiento`, `monto_total`, `estado`)
 VALUES
-('Semestre 1 – 2026', 2026, '1', 6, '2026-01-01', '2026-06-30', '2026-03-31', 72.00, 'activo'),
-('Semestre 2 – 2026', 2026, '2', 6, '2026-07-01', '2026-12-31', '2026-09-30', 72.00, 'pendiente');
+('Semestre 1 – 2026', 2026, '1', 6, '2026-01-01', '2026-06-30', '2026-03-31', 60.00, 'activo'),
+('Semestre 2 – 2026', 2026, '2', 6, '2026-07-01', '2026-12-31', '2026-09-30', 60.00, 'pendiente');
