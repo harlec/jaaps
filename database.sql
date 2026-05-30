@@ -185,7 +185,7 @@ INSERT INTO `usuarios_sistema` (`nombre`, `email`, `password`, `rol`) VALUES
 
 -- Conceptos base
 INSERT INTO `conceptos` (`nombre`, `descripcion`, `monto`, `tipo`) VALUES
-('Tarifa Mensual de Agua', 'Cuota mensual por servicio de agua potable', 12.00, 'tarifa_mensual'),
+('Tarifa Mensual de Agua', 'Cuota mensual por servicio de agua potable', 10.00, 'tarifa_mensual'),
 ('Inscripción / Conexión',  'Pago único de inscripción al padrón de abonados', 0.00, 'inscripcion'),
 ('Multa por Mora',          'Cargo por pago fuera de fecha de vencimiento', 0.00, 'multa'),
 ('Reconexión de Servicio',  'Costo por reconexión tras suspensión', 0.00, 'reconexion');

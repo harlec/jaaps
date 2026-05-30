@@ -198,7 +198,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
             <p class="text-2xl font-bold text-green-600">S/ <?= number_format($totalPagado, 2) ?></p>
           </div>
           <div>
-            <p class="text-xs text-gray-400">Tarifa anual (S/.12 × 12 meses)</p>
+            <p class="text-xs text-gray-400">Tarifa anual (S/.<?= number_format(TARIFA_MENSUAL, 2) ?> × 12 meses)</p>
             <p class="text-lg font-semibold text-gray-700">S/ <?= number_format($tarifa, 2) ?></p>
           </div>
           <div>

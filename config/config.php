@@ -22,7 +22,7 @@ define('MIGO_API_TOKEN', $_ENV['MIGO_API_TOKEN'] ?? '');
 define('MIGO_API_URL',   'https://api.migo.pe/api/v1/dni');
 
 // ── Tarifa mensual (S/.) ─────────────────────────────────────
-define('TARIFA_MENSUAL', 12.00);
+define('TARIFA_MENSUAL', 10.00);
 
 // ── Zonas disponibles ────────────────────────────────────────
 define('ZONAS', [
