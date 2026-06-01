@@ -57,10 +57,16 @@ $periodoS1 = $pdo->query(
 $conceptoTarifa = $periodoS1
     ? ($pdo->query("SELECT id FROM conceptos WHERE tipo = 'tarifa_mensual' AND activo = 1 LIMIT 1")->fetch() ?: null)
     : null;
-$urlPagoS1Base = ($periodoS1 && $conceptoTarifa)
-    ? APP_URL . '/pagos/registrar.php?concepto_id=' . $conceptoTarifa['id']
-      . '&periodo_id=' . $periodoS1['id'] . '&monto=60&abonado_id='
-    : null;
+
+// IDs de abonados que ya pagaron el semestre 1 (en la página actual)
+$pagadosS1 = [];
+if ($periodoS1 && $abonados) {
+    $ids = array_column($abonados, 'id');
+    $ph  = implode(',', array_fill(0, count($ids), '?'));
+    $stP = $pdo->prepare("SELECT DISTINCT abonado_id FROM pagos WHERE periodo_id = ? AND abonado_id IN ($ph)");
+    $stP->execute(array_merge([$periodoS1['id']], $ids));
+    $pagadosS1 = array_flip($stP->fetchAll(PDO::FETCH_COLUMN));
+}
 
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/sidebar.php';
@@ -141,7 +147,8 @@ require_once __DIR__ . '/../includes/sidebar.php';
           </thead>
           <tbody class="divide-y divide-gray-50">
             <?php foreach ($abonados as $a): ?>
-            <tr class="hover:bg-gray-50 transition-colors">
+            <?php $yaPago = isset($pagadosS1[$a['id']]); ?>
+            <tr class="transition-colors <?= $yaPago ? 'bg-emerald-50 hover:bg-emerald-100' : 'hover:bg-gray-50' ?>">
               <td class="px-5 py-3 font-mono text-xs text-gray-500"><?= e($a['codigo']) ?></td>
               <td class="px-5 py-3 font-mono text-gray-700"><?= e($a['dni']) ?></td>
               <td class="px-5 py-3">
@@ -191,14 +198,28 @@ require_once __DIR__ . '/../includes/sidebar.php';
                       <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
                     </svg>
                   </a>
-                  <?php if ($urlPagoS1Base): ?>
-                  <a href="<?= $urlPagoS1Base . $a['id'] ?>"
-                     title="Pago Semestre 1 <?= (int)$periodoS1['anio'] ?>"
-                     class="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600 transition">
+                  <?php if ($periodoS1 && $conceptoTarifa): ?>
+                  <?php if ($yaPago): ?>
+                  <span title="Semestre 1 <?= (int)$periodoS1['anio'] ?> pagado"
+                        class="p-1.5 rounded-lg text-emerald-500 cursor-default">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                  </span>
+                  <?php else: ?>
+                  <button type="button"
+                          title="Pago Semestre 1 <?= (int)$periodoS1['anio'] ?>"
+                          data-abonado="<?= $a['id'] ?>"
+                          data-concepto="<?= (int)$conceptoTarifa['id'] ?>"
+                          data-periodo="<?= (int)$periodoS1['id'] ?>"
+                          data-monto="60"
+                          onclick="pagarS1(this)"
+                          class="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600 transition">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
                     </svg>
-                  </a>
+                  </button>
+                  <?php endif; ?>
                   <?php endif; ?>
                   <a href="<?= APP_URL ?>/abonados/eliminar.php?id=<?= $a['id'] ?>"
                      title="Eliminar"
@@ -237,5 +258,38 @@ require_once __DIR__ . '/../includes/sidebar.php';
 
   </main>
 </div>
+
+<script>
+async function pagarS1(btn) {
+  btn.disabled = true;
+  const fd = new FormData();
+  fd.append('abonado_id', btn.dataset.abonado);
+  fd.append('concepto_id', btn.dataset.concepto);
+  fd.append('periodo_id', btn.dataset.periodo);
+  fd.append('monto', btn.dataset.monto);
+
+  try {
+    const r    = await fetch('<?= APP_URL ?>/api/registrar_pago_rapido.php', { method: 'POST', body: fd });
+    const data = await r.json();
+
+    if (data.success) {
+      alert('Pago registrado: ' + data.numero_recibo);
+      const row = btn.closest('tr');
+      row.classList.remove('hover:bg-gray-50');
+      row.classList.add('bg-emerald-50', 'hover:bg-emerald-100');
+      btn.outerHTML = '<span title="Semestre 1 pagado" class="p-1.5 rounded-lg text-emerald-500 cursor-default">'
+        + '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">'
+        + '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>'
+        + '</svg></span>';
+    } else {
+      alert('Error: ' + (data.error ?? 'No se pudo registrar el pago'));
+      btn.disabled = false;
+    }
+  } catch (e) {
+    alert('Error de conexión al registrar el pago');
+    btn.disabled = false;
+  }
+}
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
