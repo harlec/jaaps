@@ -49,7 +49,7 @@ try {
            fecha_pago, metodo_pago, registrado_por)
         VALUES
           (:abonado_id, :concepto_id, :periodo_id, :numero_recibo,
-           :monto, 0, 0, :monto,
+           :monto, 0, 0, :monto_total,
            CURDATE(), 'efectivo', :registrado_por)
     ");
     $ins->execute([
@@ -58,6 +58,7 @@ try {
         ':periodo_id'     => $periodoId,
         ':numero_recibo'  => $numeroRecibo,
         ':monto'          => $monto,
+        ':monto_total'    => $monto,
         ':registrado_por' => currentUser()['id'],
     ]);
     echo json_encode(['success' => true, 'numero_recibo' => $numeroRecibo]);
