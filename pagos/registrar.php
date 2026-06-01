@@ -8,7 +8,10 @@ $pdo        = getDB();
 $errors     = [];
 
 // Pre-cargar abonado si viene de ?abonado_id
-$preAbonadoId = (int)($_GET['abonado_id'] ?? $_POST['abonado_id'] ?? 0);
+$preAbonadoId  = (int)($_GET['abonado_id']  ?? $_POST['abonado_id']  ?? 0);
+$preConceptoId = (int)($_GET['concepto_id'] ?? $_POST['concepto_id'] ?? 0);
+$prePeriodoId  = (int)($_GET['periodo_id']  ?? $_POST['periodo_id']  ?? 0);
+$preMonto      = (float)($_GET['monto']     ?? $_POST['monto']       ?? 0);
 $preAbonado   = null;
 if ($preAbonadoId > 0) {
     $s = $pdo->prepare("SELECT id, codigo, dni, nombres, apellidos, zona FROM abonados WHERE id = ? AND estado = 'activo'");
@@ -19,6 +22,19 @@ if ($preAbonadoId > 0) {
 // Datos para selects
 $conceptos = $pdo->query("SELECT * FROM conceptos WHERE activo = 1 ORDER BY tipo, nombre")->fetchAll();
 $periodos  = $pdo->query("SELECT * FROM periodos_cobro WHERE estado IN ('activo','pendiente') ORDER BY anio DESC, semestre")->fetchAll();
+
+// Pago rápido: primer período activo/pendiente de semestre 1
+$pagoRapido = null;
+foreach ($periodos as $p) {
+    if ($p['semestre'] === '1') {
+        foreach ($conceptos as $c) {
+            if ($c['tipo'] === 'tarifa_mensual') {
+                $pagoRapido = ['periodo' => $p, 'concepto' => $c, 'monto' => 60.00];
+                break 2;
+            }
+        }
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $abonadoId  = (int)($_POST['abonado_id']  ?? 0);
@@ -105,7 +121,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
 
     <form method="POST" action=""
           x-data="{
-            monto: <?= (float)($_POST['monto'] ?? TARIFA_MENSUAL * 6) ?>,
+            monto: <?= $preMonto > 0 ? $preMonto : (float)(TARIFA_MENSUAL * 6) ?>,
             descuento: <?= (float)($_POST['descuento'] ?? 0) ?>,
             interes: <?= (float)($_POST['interes'] ?? 0) ?>,
             get total() { return Math.max(0, parseFloat(this.monto||0) - parseFloat(this.descuento||0) + parseFloat(this.interes||0)).toFixed(2); }
@@ -143,6 +159,26 @@ require_once __DIR__ . '/../includes/sidebar.php';
         </div>
       </div>
 
+      <?php if ($pagoRapido): ?>
+      <!-- Pago rápido semestral -->
+      <div class="flex items-center justify-between gap-4 px-5 py-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+        <div>
+          <p class="text-sm font-semibold text-emerald-800">Pago Semestre 1 <?= (int)$pagoRapido['periodo']['anio'] ?></p>
+          <p class="text-xs text-emerald-600 mt-0.5">
+            <?= e($pagoRapido['periodo']['nombre']) ?> &nbsp;·&nbsp; S/ 10.00 × 6 meses = <strong>S/ 60.00</strong>
+          </p>
+        </div>
+        <button type="button"
+                data-concepto="<?= (int)$pagoRapido['concepto']['id'] ?>"
+                data-periodo="<?= (int)$pagoRapido['periodo']['id'] ?>"
+                data-monto="60"
+                onclick="aplicarPagoRapido(this)"
+                class="shrink-0 px-4 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors">
+          Registrar Pago Semestre 1 <?= (int)$pagoRapido['periodo']['anio'] ?>
+        </button>
+      </div>
+      <?php endif; ?>
+
       <!-- Concepto y período -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="px-5 py-4 border-b border-gray-100"><h2 class="text-sm font-semibold text-gray-700">Concepto de Pago</h2></div>
@@ -156,7 +192,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
               <?php foreach ($conceptos as $c): ?>
                 <option value="<?= $c['id'] ?>"
                         data-monto="<?= $c['monto'] ?>"
-                        <?= ((int)($_POST['concepto_id'] ?? 0)) === (int)$c['id'] ? 'selected' : '' ?>>
+                        <?= $preConceptoId === (int)$c['id'] ? 'selected' : '' ?>>
                   <?= e($c['nombre']) ?> (S/ <?= number_format((float)$c['monto'], 2) ?>)
                 </option>
               <?php endforeach; ?>
@@ -169,7 +205,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
               <option value="">Sin período</option>
               <?php foreach ($periodos as $p): ?>
                 <option value="<?= $p['id'] ?>"
-                        <?= ((int)($_POST['periodo_id'] ?? 0)) === (int)$p['id'] ? 'selected' : '' ?>>
+                        <?= $prePeriodoId === (int)$p['id'] ? 'selected' : '' ?>>
                   <?= e($p['nombre']) ?> – S/ <?= number_format((float)$p['monto_total'], 2) ?>
                 </option>
               <?php endforeach; ?>
@@ -186,7 +222,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
             <label class="block text-xs font-medium text-gray-600 mb-1">Monto base (S/.) <span class="text-red-500">*</span></label>
             <input id="inputMonto" name="monto" type="number" step="0.01" min="0.01"
                    x-model="monto" required
-                   value="<?= number_format((float)($_POST['monto'] ?? TARIFA_MENSUAL * 6), 2) ?>"
+                   value="<?= number_format($preMonto > 0 ? $preMonto : TARIFA_MENSUAL * 6, 2) ?>"
                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-300">
           </div>
           <div>
@@ -257,6 +293,19 @@ require_once __DIR__ . '/../includes/sidebar.php';
 </div>
 
 <script>
+function aplicarPagoRapido(btn) {
+  const conceptoSel = document.querySelector('select[name="concepto_id"]');
+  const periodoSel  = document.querySelector('select[name="periodo_id"]');
+  const montoInput  = document.getElementById('inputMonto');
+
+  conceptoSel.value = btn.dataset.concepto;
+  periodoSel.value  = btn.dataset.periodo;
+  montoInput.value  = btn.dataset.monto;
+  montoInput.dispatchEvent(new Event('input'));
+
+  montoInput.closest('form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 // Búsqueda de abonado en tiempo real
 const inp = document.getElementById('buscarAbonado');
 const res = document.getElementById('resultados');
