@@ -153,8 +153,9 @@ function generarNumeroRecibo(): string
     $pdo  = getDB();
     $anio = date('Y');
     $row  = $pdo->query(
-        "SELECT COUNT(*) AS total FROM pagos WHERE YEAR(fecha_pago) = $anio"
+        "SELECT MAX(CAST(SUBSTRING(numero_recibo, 9) AS UNSIGNED)) AS max
+         FROM pagos WHERE numero_recibo LIKE 'REC-{$anio}%'"
     )->fetch();
-    $next = ($row['total'] ?? 0) + 1;
+    $next = ($row['max'] ?? 0) + 1;
     return 'REC-' . $anio . str_pad((string)$next, 5, '0', STR_PAD_LEFT);
 }
