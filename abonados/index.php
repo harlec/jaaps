@@ -273,7 +273,7 @@ async function pagarS1(btn) {
     const data = await r.json();
 
     if (data.success) {
-      alert('Pago registrado: ' + data.numero_recibo);
+      showToast('Pago registrado: ' + data.numero_recibo);
       const row = btn.closest('tr');
       row.classList.remove('hover:bg-gray-50');
       row.classList.add('bg-emerald-50', 'hover:bg-emerald-100');
@@ -282,11 +282,11 @@ async function pagarS1(btn) {
         + '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>'
         + '</svg></span>';
     } else {
-      alert('Error: ' + (data.error ?? 'No se pudo registrar el pago'));
+      showToast(data.error ?? 'No se pudo registrar el pago', 'error');
       btn.disabled = false;
     }
   } catch (e) {
-    alert('Error de conexión al registrar el pago');
+    showToast('Error de conexión al registrar el pago', 'error');
     btn.disabled = false;
   }
 }
