@@ -1,7 +1,7 @@
 <?php
 /**
  * verificar_nombres.php
- * Herramienta para validar y corregir nombres de abonados contra la API migo.pe.
+ * Herramienta para validar y corregir nombres de abonados contra la API RENIEC.
  * Requiere inicio de sesión como administrador.
  */
 
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'actua
             "UPDATE abonados
                 SET nombres    = ?,
                     apellidos  = ?,
-                    observaciones = CONCAT(COALESCE(observaciones,''), ' | Nombre actualizado desde migo.pe el " . date('Y-m-d') . "')
+                    observaciones = CONCAT(COALESCE(observaciones,''), ' | Nombre actualizado desde apisunat el " . date('Y-m-d') . "')
               WHERE id = ?"
         );
         $stmt->execute([$nuevosNombres, $nuevosApellidos, $id]);
@@ -60,7 +60,7 @@ $zonaLabel = ['tunas' => 'Tunas', 'cerro_de_pasco' => 'Pasco - Carrizales', 'por
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verificar Nombres con migo.pe | JAAP</title>
+  <title>Verificar Nombres con RENIEC | JAAP</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>tailwind.config = { theme: { extend: { colors: { brand: { 600:'#0d9488', 700:'#0f766e' } } } } }</script>
 </head>
@@ -71,9 +71,9 @@ $zonaLabel = ['tunas' => 'Tunas', 'cerro_de_pasco' => 'Pasco - Carrizales', 'por
   <!-- Encabezado -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Verificar Nombres con migo.pe</h1>
+      <h1 class="text-2xl font-bold text-gray-900">Verificar Nombres con RENIEC</h1>
       <p class="text-sm text-gray-500 mt-1">
-        Compara los nombres del padrón contra el RENIEC a través de la API migo.pe.
+        Compara los nombres del padrón contra el RENIEC a través de la API RENIEC.
         <strong><?= $totalAbonados ?> abonados</strong> con DNI real.
       </p>
     </div>
@@ -124,7 +124,7 @@ $zonaLabel = ['tunas' => 'Tunas', 'cerro_de_pasco' => 'Pasco - Carrizales', 'por
           <th class="px-4 py-3 text-left">Nombres (sistema)</th>
           <th class="px-4 py-3 text-left">Apellidos (sistema)</th>
           <th class="px-4 py-3 text-left">Zona</th>
-          <th class="px-4 py-3 text-left">Nombre RENIEC (migo.pe)</th>
+          <th class="px-4 py-3 text-left">Nombre RENIEC (RENIEC)</th>
           <th class="px-4 py-3 text-center">Acción</th>
         </tr>
       </thead>
@@ -184,17 +184,14 @@ async function verificarUno(id) {
         const data = await res.json();
 
         if (!data.success) {
-            apiCell.innerHTML = `<span class="text-red-500">❌ ${data.error ?? 'No encontrado'}</span>`;
+            apiCell.innerHTML = `<span class="text-red-500">❌ ${data.message ?? 'No encontrado'}</span>`;
             row.classList.add('bg-red-50');
             return;
         }
 
-        // migo.pe devuelve: "APELLIDO1 APELLIDO2 NOMBRE1 NOMBRE2"
-        const partes        = data.nombre.trim().split(/\s+/);
-        const apiApellidos  = partes.slice(0, 2).join(' ');
-        const apiNombres    = partes.slice(2).join(' ');
-
-        const nombreCompleto = data.nombre;
+        const apiNombres     = data.nombres;
+        const apiApellidos   = data.apellidos;
+        const nombreCompleto = data.nombre_completo;
         const sistemaCompleto= (apellidos + ' ' + nombres).toUpperCase();
         const apiCompleto    = nombreCompleto.toUpperCase();
 

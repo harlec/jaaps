@@ -332,11 +332,10 @@ document.getElementById('btnBuscarDni').addEventListener('click', async () => {
     try {
         const res  = await fetch('<?= APP_URL ?>/api/dni.php?dni=' + encodeURIComponent(dni));
         const json = await res.json();
-        if (json.success && json.nombre) {
-            const parts = json.nombre.trim().split(/\s+/);
-            document.getElementById('apellidos').value = parts.slice(0,2).join(' ');
-            document.getElementById('nombres').value   = parts.slice(2).join(' ');
-            msg.textContent = '✓ Datos cargados.'; msg.className = 'text-xs mt-1 text-green-600';
+        if (json.success) {
+            document.getElementById('apellidos').value = json.apellidos;
+            document.getElementById('nombres').value   = json.nombres;
+            msg.textContent = '✓ Datos cargados desde RENIEC'; msg.className = 'text-xs mt-1 text-green-600';
         } else {
             msg.textContent = json.message ?? 'DNI no encontrado.'; msg.className = 'text-xs mt-1 text-orange-500';
         }

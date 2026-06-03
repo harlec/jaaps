@@ -16,10 +16,10 @@ define('APP_URL',     $_ENV['APP_URL'] ?? 'http://localhost/jaaps');
 define('SESSION_NAME',      'jaap_session');
 define('SESSION_LIFETIME',  7200); // 2 horas en segundos
 
-// ── API migo.pe – DNI lookup ─────────────────────────────────
+// ── API SUNAT – DNI lookup (apisunat.harlec.com.pe) ──────────
 // El token se lee del archivo .env (ver .env.example)
-define('MIGO_API_TOKEN', $_ENV['MIGO_API_TOKEN'] ?? '');
-define('MIGO_API_URL',   'https://api.migo.pe/api/v1/dni');
+define('SUNAT_API_TOKEN', $_ENV['SUNAT_API_TOKEN'] ?? '');
+define('SUNAT_API_URL',   'https://apisunat.harlec.com.pe/api/v1/dni');
 
 // ── Tarifa mensual (S/.) ─────────────────────────────────────
 define('TARIFA_MENSUAL', 10.00);

@@ -59,10 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['archivo'])) {
                     // Intentar consultar API si está activado
                     if ($consultarDNI) {
                         $apiResp = consultarDniMigo($dni);
-                        if ($apiResp['success'] && !empty($apiResp['nombre'])) {
-                            $parts     = explode(' ', $apiResp['nombre'], 3);
-                            $apellidos = $parts[0] . ' ' . ($parts[1] ?? '');
-                            $nombres   = $parts[2] ?? '';
+                        if ($apiResp['success']) {
+                            $apellidos = $apiResp['apellidos'] ?? '';
+                            $nombres   = $apiResp['nombres']   ?? '';
                         }
                     }
                     if ($nombres === '' && $apellidos === '') {
@@ -109,19 +108,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['archivo'])) {
 
 function consultarDniMigo(string $dni): array
 {
-    $ch = curl_init(MIGO_API_URL);
+    $ch = curl_init(SUNAT_API_URL . '/' . $dni);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST           => true,
+        CURLOPT_HTTPGET        => true,
         CURLOPT_TIMEOUT        => 5,
-        CURLOPT_HTTPHEADER     => ['Accept: application/json', 'Content-Type: application/json'],
-        CURLOPT_POSTFIELDS     => json_encode(['token' => MIGO_API_TOKEN, 'dni' => $dni]),
+        CURLOPT_HTTPHEADER     => [
+            'Authorization: Bearer ' . SUNAT_API_TOKEN,
+            'Accept: application/json',
+        ],
         CURLOPT_SSL_VERIFYPEER => true,
     ]);
     $body = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    if (!$body) return ['success' => false];
-    return json_decode($body, true) ?? ['success' => false];
+    if (!$body || $code !== 200) return ['success' => false];
+    $data = json_decode($body, true) ?? [];
+    $apellPat = strtoupper(trim($data['apellido_pat'] ?? ''));
+    $apellMat = strtoupper(trim($data['apellido_mat'] ?? ''));
+    $nombres  = strtoupper(trim($data['nombres']      ?? ''));
+    if ($nombres === '' && $apellPat === '') return ['success' => false];
+    return [
+        'success'   => true,
+        'nombres'   => $nombres,
+        'apellidos' => trim("$apellPat $apellMat"),
+    ];
 }
 
 require_once __DIR__ . '/../includes/header.php';

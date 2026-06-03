@@ -1,15 +1,14 @@
 <?php
 /**
  * api/dni.php
- * Proxy seguro para consulta DNI via migo.pe
+ * Proxy seguro para consulta DNI via apisunat.harlec.com.pe
  * GET ?dni=12345678
- * Devuelve JSON compatible con la respuesta de migo.pe
+ * Devuelve JSON: {success, nombres, apellido_pat, apellido_mat, apellidos, nombre_completo}
  */
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config/config.php';
 
-// Requiere sesión activa (no debe ser accesible sin autenticar)
 if (!isLoggedIn()) {
     http_response_code(401);
     header('Content-Type: application/json');
@@ -26,25 +25,21 @@ if (!preg_match('/^\d{8}$/', $dni)) {
     exit;
 }
 
-if (MIGO_API_TOKEN === 'TU_TOKEN_AQUI' || MIGO_API_TOKEN === '') {
-    echo json_encode(['success' => false, 'message' => 'Token de API no configurado. Edita config/config.php']);
+if (SUNAT_API_TOKEN === '') {
+    echo json_encode(['success' => false, 'message' => 'Token de API no configurado.']);
     exit;
 }
 
-// Llamada a migo.pe
-$payload = json_encode(['token' => MIGO_API_TOKEN, 'dni' => $dni]);
-
-$ch = curl_init(MIGO_API_URL);
+$ch = curl_init(SUNAT_API_URL . '/' . $dni);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST           => true,
+    CURLOPT_HTTPGET        => true,
     CURLOPT_TIMEOUT        => 8,
     CURLOPT_CONNECTTIMEOUT => 5,
     CURLOPT_HTTPHEADER     => [
+        'Authorization: Bearer ' . SUNAT_API_TOKEN,
         'Accept: application/json',
-        'Content-Type: application/json',
     ],
-    CURLOPT_POSTFIELDS     => $payload,
     CURLOPT_SSL_VERIFYPEER => true,
 ]);
 
@@ -58,13 +53,18 @@ if ($curlErr || $response === false) {
     exit;
 }
 
-if ($httpCode === 403) {
-    echo json_encode(['success' => false, 'message' => 'Token de API inválido o sin créditos.']);
+if ($httpCode === 401 || $httpCode === 403) {
+    echo json_encode(['success' => false, 'message' => 'Token de API inválido o sin acceso.']);
     exit;
 }
 
 if ($httpCode === 404) {
     echo json_encode(['success' => false, 'message' => 'DNI no encontrado en la base de datos.']);
+    exit;
+}
+
+if ($httpCode === 429) {
+    echo json_encode(['success' => false, 'message' => 'Límite diario de consultas alcanzado.']);
     exit;
 }
 
@@ -74,5 +74,22 @@ if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
     exit;
 }
 
-// Reenviar respuesta de migo.pe directamente
-echo json_encode($data);
+// Normalizar campos de la respuesta
+$nombres    = strtoupper(trim($data['nombres']      ?? ''));
+$apellPat   = strtoupper(trim($data['apellido_pat'] ?? ''));
+$apellMat   = strtoupper(trim($data['apellido_mat'] ?? ''));
+$apellidos  = trim("$apellPat $apellMat");
+
+if ($nombres === '' && $apellidos === '') {
+    echo json_encode(['success' => false, 'message' => 'No se obtuvieron datos para ese DNI.']);
+    exit;
+}
+
+echo json_encode([
+    'success'        => true,
+    'nombres'        => $nombres,
+    'apellido_pat'   => $apellPat,
+    'apellido_mat'   => $apellMat,
+    'apellidos'      => $apellidos,
+    'nombre_completo'=> trim("$apellidos $nombres"),
+]);

@@ -345,17 +345,10 @@ document.getElementById('btnBuscarDni').addEventListener('click', async () => {
         const res  = await fetch('<?= APP_URL ?>/api/dni.php?dni=' + encodeURIComponent(dni));
         const json = await res.json();
 
-        if (json.success && json.nombre) {
-            const parts = json.nombre.trim().split(/\s+/);
-            // migo retorna "APELLIDO1 APELLIDO2 NOMBRE1 NOMBRE2"
-            // Suponemos primeras 2 palabras = apellidos, resto = nombres
-            const apellidos = parts.slice(0, 2).join(' ');
-            const nombres   = parts.slice(2).join(' ');
-
-            document.getElementById('apellidos').value = apellidos;
-            document.getElementById('nombres').value   = nombres;
-
-            msg.textContent = '✓ Datos cargados desde migo.pe';
+        if (json.success) {
+            document.getElementById('apellidos').value = json.apellidos;
+            document.getElementById('nombres').value   = json.nombres;
+            msg.textContent = '✓ Datos cargados desde RENIEC';
             msg.className   = 'text-xs mt-1 text-green-600';
         } else {
             msg.textContent = json.message ?? 'No se encontró información para ese DNI.';
