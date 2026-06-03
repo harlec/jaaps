@@ -74,10 +74,16 @@ if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
     exit;
 }
 
-// Si la API devolvió un error en el cuerpo (algunos servicios retornan 200 con error)
-if (isset($data['error']) || isset($data['message']) && !isset($data['nombres'])) {
-    $msg = $data['message'] ?? $data['error'] ?? 'Error del servicio de DNI.';
-    echo json_encode(['success' => false, 'message' => $msg, '_raw' => $data]);
+// Si la API devolvió un error en el cuerpo
+if (!isset($data['nombres']) && !isset($data['apellido_pat'])) {
+    $code = $data['code'] ?? '';
+    $msg  = match($code) {
+        'SOURCE_ERROR'      => 'El servicio RENIEC no está disponible en este momento. Intenta en unos minutos.',
+        'PLAN_RESTRICTION'  => 'El plan actual no tiene acceso a consultas de DNI.',
+        'INVALID_FORMAT'    => 'DNI inválido.',
+        default             => $data['error'] ?? $data['message'] ?? 'Error del servicio de DNI.',
+    };
+    echo json_encode(['success' => false, 'message' => $msg]);
     exit;
 }
 
@@ -88,7 +94,7 @@ $apellMat   = strtoupper(trim($data['apellido_mat'] ?? ''));
 $apellidos  = trim("$apellPat $apellMat");
 
 if ($nombres === '' && $apellidos === '') {
-    echo json_encode(['success' => false, 'message' => 'No se obtuvieron datos para ese DNI.', '_raw' => $data]);
+    echo json_encode(['success' => false, 'message' => 'No se obtuvieron datos para ese DNI.']);
     exit;
 }
 
