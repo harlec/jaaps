@@ -74,6 +74,13 @@ if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
     exit;
 }
 
+// Si la API devolvió un error en el cuerpo (algunos servicios retornan 200 con error)
+if (isset($data['error']) || isset($data['message']) && !isset($data['nombres'])) {
+    $msg = $data['message'] ?? $data['error'] ?? 'Error del servicio de DNI.';
+    echo json_encode(['success' => false, 'message' => $msg, '_raw' => $data]);
+    exit;
+}
+
 // Normalizar campos de la respuesta
 $nombres    = strtoupper(trim($data['nombres']      ?? ''));
 $apellPat   = strtoupper(trim($data['apellido_pat'] ?? ''));
@@ -81,7 +88,7 @@ $apellMat   = strtoupper(trim($data['apellido_mat'] ?? ''));
 $apellidos  = trim("$apellPat $apellMat");
 
 if ($nombres === '' && $apellidos === '') {
-    echo json_encode(['success' => false, 'message' => 'No se obtuvieron datos para ese DNI.']);
+    echo json_encode(['success' => false, 'message' => 'No se obtuvieron datos para ese DNI.', '_raw' => $data]);
     exit;
 }
 
