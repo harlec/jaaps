@@ -10,10 +10,14 @@ $nav = [
     ['href' => APP_URL . '/dashboard.php',            'icon' => 'grid',        'label' => 'Dashboard',       'key' => 'dashboard'],
     ['href' => APP_URL . '/abonados/index.php',        'icon' => 'users',       'label' => 'Abonados',        'key' => 'abonados'],
     ['href' => APP_URL . '/pagos/index.php',           'icon' => 'currency',    'label' => 'Pagos',           'key' => 'pagos'],
+    ['href' => APP_URL . '/gastos/index.php',          'icon' => 'banknotes',   'label' => 'Gastos',          'key' => 'gastos'],
+    ['href' => APP_URL . '/ingresos/index.php',        'icon' => 'trending',    'label' => 'Otros Ingresos',  'key' => 'ingresos'],
+    ['href' => APP_URL . '/reportes/balance.php',      'icon' => 'scale',       'label' => 'Balance',         'key' => 'balance'],
     ['href' => APP_URL . '/inscripciones/index.php',   'icon' => 'clipboard',   'label' => 'Inscripciones',   'key' => 'inscripciones'],
     ['href' => APP_URL . '/conceptos/index.php',       'icon' => 'tag',         'label' => 'Conceptos',       'key' => 'conceptos'],
     ['href' => APP_URL . '/importar/index.php',        'icon' => 'upload',      'label' => 'Importar',        'key' => 'importar'],
     ['href' => APP_URL . '/reportes/deudores.php',     'icon' => 'alert',       'label' => 'Deudores',        'key' => 'reportes'],
+    ['href' => APP_URL . '/reportes/abonados.php',     'icon' => 'clipboard',   'label' => 'Reporte Abonados','key' => 'reporte_abonados'],
 ];
 
 $icons = [
@@ -24,6 +28,9 @@ $icons = [
     'tag'      => '<path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />',
     'upload'   => '<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />',
     'alert'    => '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />',
+    'banknotes'=> '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />',
+    'trending' => '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />',
+    'scale'    => '<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0-17.25c-1.472 0-2.882.265-4.185.75M12 3c1.472 0 2.882.265 4.185.75M18.75 21H5.25M7.815 3.75 3 12l4.815-.75m.001 0L12 3m0 9-4.185-.75M16.185 3.75 21 12l-4.815-.75M16.185 3.75 12 12m4.185-.75L21 12m-9 0 4.185.75" />',
 ];
 ?>
 <!-- SIDEBAR -->
