@@ -5,7 +5,9 @@
 reset_admin.php
 
 # ── Dependencias / paquetes ──────────────────────────────────
-vendor/
+# vendor/ SÍ se versiona a propósito: el servidor de producción no tiene
+# Composer, así que PhpSpreadsheet (usado en reportes/abonados_excel.php)
+# se sube ya generado. No ejecutar "composer install" sin revisar esto.
 node_modules/
 
 # ── Archivos subidos por usuarios ────────────────────────────
