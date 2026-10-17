@@ -83,7 +83,7 @@ function reciboCss(): string
     .cantidad .et { font-weight: 600; white-space: nowrap; }
     .cantidad .val { flex: 1; border: 1px solid #2b3a9e; border-radius: 6px; padding: 4px 8px; color: #111; font-size: 11.5px; min-height: 24px; }
 
-    .pie { margin-top: auto; display: flex; align-items: flex-end; gap: 4mm; }
+    .pie { margin-top: 3mm; display: flex; align-items: flex-start; gap: 4mm; }
     .fechas { border: 1.5px solid #2b3a9e; border-radius: 9px; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 11px; }
     .fechas th, .fechas td { padding: 2px 10px; }
     .fechas thead th { border-bottom: 1.5px solid #2b3a9e; font-weight: 900; }
@@ -92,7 +92,7 @@ function reciboCss(): string
     .fechas td { color: #111; font-size: 14px; font-weight: bold; }
     .fechas td + td, .fechas thead th + th { border-left: 1px solid #2b3a9e; }
     .fechas td.venc { color: #b91c1c; }
-    .izq { display: flex; flex-direction: column; gap: 9mm; }
+    .izq { display: flex; flex-direction: column; gap: 11mm; }
     .firma { width: 100%; text-align: center; font-size: 10px; font-weight: 600; }
     .firma div { border-top: 1px solid #2b3a9e; margin-bottom: 2px; }
     .pago { flex: 1; font-size: 11px; line-height: 1.3; color: #111; align-self: center; }
