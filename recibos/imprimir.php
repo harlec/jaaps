@@ -36,7 +36,7 @@ if ($soloDeud) {
     $params[] = $periodoId;
 }
 $stmt = $pdo->prepare("
-    SELECT a.codigo, a.nombres, a.apellidos
+    SELECT a.codigo, a.nombres, a.apellidos, a.zona
     FROM abonados a
     WHERE " . implode(' AND ', $where) . "
     ORDER BY a.zona, a.apellidos, a.nombres
@@ -72,6 +72,7 @@ foreach ($abonados as $i => $a) {
         'monto'       => $monto,
         'concepto'    => $concepto,
         'mes'         => $mes,
+        'sector'      => ZONAS[$a['zona']] ?? $a['zona'],
         'fecha'       => $emision,
         'vencimiento' => $venc,
     ];
