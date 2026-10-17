@@ -16,6 +16,7 @@ $nav = [
     ['href' => APP_URL . '/inscripciones/index.php',   'icon' => 'clipboard',   'label' => 'Inscripciones',   'key' => 'inscripciones'],
     ['href' => APP_URL . '/conceptos/index.php',       'icon' => 'tag',         'label' => 'Conceptos',       'key' => 'conceptos'],
     ['href' => APP_URL . '/importar/index.php',        'icon' => 'upload',      'label' => 'Importar',        'key' => 'importar'],
+    ['href' => APP_URL . '/recibos/index.php',         'icon' => 'clipboard',   'label' => 'Generar Recibos', 'key' => 'recibos'],
     ['href' => APP_URL . '/reportes/deudores.php',     'icon' => 'alert',       'label' => 'Deudores',        'key' => 'reportes'],
     ['href' => APP_URL . '/reportes/abonados.php',     'icon' => 'clipboard',   'label' => 'Reporte Abonados','key' => 'reporte_abonados'],
 ];

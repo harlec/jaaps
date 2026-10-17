@@ -44,6 +44,7 @@ INSERT IGNORE INTO `gasto_conceptos` (`nombre`, `descripcion`) VALUES
 ('Lavado de pozo',         'Mantenimiento y limpieza del pozo'),
 ('Compra de materiales',   'Tuberías, válvulas, accesorios y otros materiales'),
 ('Mantenimiento de red',   'Reparaciones y mantenimiento de la red de distribución'),
+('Pago personal',          'Pago de sueldos o retribuciones al personal'),
 ('Otro',                   'Gastos varios no clasificados');
 
 -- ============================================================
