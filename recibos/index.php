@@ -44,7 +44,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
     <div>
       <h1 class="text-lg font-bold text-gray-800">Generar recibos por período</h1>
       <p class="text-sm text-gray-400">
-        Genera un recibo (A6, 4 por hoja A4) por cada abonado <strong>activo</strong>.
+        Genera un recibo (A6 horizontal, 4 por hoja A4) por cada abonado <strong>activo</strong>.
         Se omiten cortados, en suspensión temporal e inactivos
         (<?= $cantExcl ?> abonados excluidos de <?= $cantActivos + $cantExcl ?>).
       </p>

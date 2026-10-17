@@ -47,54 +47,55 @@ function montoALetras(float $monto): string
 const MESES_ES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto',
                   'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-/** CSS del recibo (formato talonario JAAPS, A6 vertical; 4 por hoja A4). */
+/** CSS del recibo (formato talonario JAAPS, A6 horizontal; 4 por hoja A4 horizontal). */
 function reciboCss(): string
 {
     return <<<'CSS'
-    @page { size: A4 portrait; margin: 0; }
+    @page { size: A4 landscape; margin: 0; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; color: #2b3a9e; background: #f3f4f6; }
     .toolbar { background: #0d9488; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; gap: 12px; }
     .toolbar button { background: #fff; color: #0d9488; border: none; padding: 7px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .toolbar a { color: rgba(255,255,255,.85); text-decoration: none; font-size: 12px; }
 
-    .hoja { width: 210mm; height: 297mm; background: #fff; margin: 16px auto; display: grid; grid-template-columns: 105mm 105mm; grid-template-rows: 148.5mm 148.5mm; box-shadow: 0 2px 12px rgba(0,0,0,.12); page-break-after: always; break-after: page; overflow: hidden; }
+    .hoja { width: 297mm; height: 210mm; background: #fff; margin: 16px auto; display: grid; grid-template-columns: 148.5mm 148.5mm; grid-template-rows: 105mm 105mm; box-shadow: 0 2px 12px rgba(0,0,0,.12); page-break-after: always; break-after: page; overflow: hidden; }
     .hoja:last-child { page-break-after: auto; break-after: auto; }
-    .recibo { width: 105mm; height: 148.5mm; padding: 4mm; }
-    .marco { height: 100%; border: 1.5px solid #2b3a9e; border-radius: 7px; padding: 2px; }
-    .marco-int { height: 100%; border: 1px solid #2b3a9e; border-radius: 5px; padding: 4mm 4mm 3mm; display: flex; flex-direction: column; }
+    .recibo { width: 148.5mm; height: 105mm; padding: 4mm; }
+    .marco { height: 100%; border: 1.5px solid #2b3a9e; border-radius: 8px; padding: 2px; }
+    .marco-int { height: 100%; border: 1px solid #2b3a9e; border-radius: 6px; padding: 3mm 5mm 3mm; display: flex; flex-direction: column; }
 
+    .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 4mm; }
     .cab { line-height: 1.15; }
-    .cab h1 { font-size: 10.5px; font-weight: 900; letter-spacing: -.3px; }
-    .cab p  { font-size: 8px; font-weight: bold; margin-top: 1px; }
-    .soles-box { margin-top: 2.5mm; width: 40mm; align-self: flex-end; border: 1.5px solid #2b3a9e; border-radius: 5px; padding: 3px 7px; font-size: 14px; font-weight: bold; display: flex; gap: 5px; color: #111; }
+    .cab h1 { font-size: 12px; font-weight: 900; letter-spacing: -.3px; }
+    .cab p  { font-size: 9px; font-weight: bold; margin-top: 1px; }
+    .soles-box { min-width: 30mm; border: 1.5px solid #2b3a9e; border-radius: 5px; padding: 3px 7px; font-size: 14px; font-weight: bold; display: flex; gap: 5px; color: #111; }
     .soles-box b { color: #2b3a9e; }
 
-    .fila-titulo { display: flex; align-items: center; justify-content: space-between; margin: 2.5mm 0 4.5mm; }
-    .pill { background: #2b3a9e; color: #fff; font-weight: bold; font-size: 14px; letter-spacing: 1px; padding: 4px 18px; border-radius: 12px; }
-    .numero { color: #dc2626; font-family: 'Times New Roman', serif; font-size: 14px; font-weight: bold; padding-right: 3mm; }
+    .fila-titulo { display: flex; align-items: center; justify-content: center; gap: 22mm; margin: 2mm 0 3mm; }
+    .pill { background: #2b3a9e; color: #fff; font-weight: bold; font-size: 14px; letter-spacing: 1px; padding: 3px 20px; border-radius: 11px; }
+    .numero { color: #dc2626; font-family: 'Times New Roman', serif; font-size: 14px; font-weight: bold; }
 
-    .linea { display: flex; align-items: flex-end; gap: 4px; margin-bottom: 4.5mm; font-size: 9.5px; }
+    .linea { display: flex; align-items: flex-end; gap: 4px; margin-bottom: 2.5mm; font-size: 10px; }
     .linea .et { font-weight: 600; white-space: nowrap; }
-    .linea .val { flex: 1; border-bottom: 1px solid #2b3a9e; min-height: 14px; padding: 0 2px 1px; color: #111; font-size: 9.5px; }
+    .linea .val { flex: 1; border-bottom: 1px solid #2b3a9e; min-height: 14px; padding: 0 2px 1px; color: #111; font-size: 10px; }
     .linea.lineas2 { display: block; }
-    .linea.lineas2 .val { display: block; margin-top: 3.5mm; }
+    .linea.lineas2 .val { display: block; margin-top: 2.5mm; }
     .linea.lineas2 .head { display: flex; align-items: flex-end; gap: 4px; }
 
-    .cantidad { display: flex; align-items: center; gap: 4px; margin-bottom: 4.5mm; font-size: 9.5px; }
+    .cantidad { display: flex; align-items: center; gap: 4px; margin-bottom: 2.5mm; font-size: 10px; }
     .cantidad .et { font-weight: 600; white-space: nowrap; }
-    .cantidad .val { flex: 1; border: 1px solid #2b3a9e; border-radius: 5px; padding: 5px 6px; color: #111; font-size: 8.5px; min-height: 22px; }
+    .cantidad .val { flex: 1; border: 1px solid #2b3a9e; border-radius: 5px; padding: 3px 6px; color: #111; font-size: 9px; min-height: 18px; }
 
     .pie { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 5mm; }
-    .izq { display: flex; flex-direction: column; gap: 2mm; }
-    .venc { font-size: 8px; color: #111; }
+    .izq { display: flex; align-items: flex-end; gap: 4mm; }
+    .venc { font-size: 8.5px; color: #111; }
     .venc b { color: #2b3a9e; }
     .fecha { border: 1.2px solid #2b3a9e; border-radius: 7px; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 8.5px; }
-    .fecha th, .fecha td { padding: 3px 8px; }
+    .fecha th, .fecha td { padding: 2px 8px; }
     .fecha th { border-bottom: 1.2px solid #2b3a9e; font-weight: 900; }
-    .fecha td { color: #111; font-size: 10px; height: 20px; }
+    .fecha td { color: #111; font-size: 10px; height: 17px; }
     .fecha th + th, .fecha td + td { border-left: 1.2px solid #2b3a9e; }
-    .firma { width: 34mm; text-align: center; font-size: 8px; }
+    .firma { width: 42mm; text-align: center; font-size: 8px; }
     .firma div { border-top: 1px solid #2b3a9e; margin-bottom: 2px; }
 
     @media print {
@@ -127,11 +128,13 @@ function renderRecibo(array $r): void
     $monto = (float)$r['monto'];
     ?>
 <div class="recibo"><div class="marco"><div class="marco-int">
-  <div class="cab">
-    <h1>JAAPS JUNTA ADMINISTRADORA DE AGUA POTABLE</h1>
-    <p>SECTOR CARRIZALES - LACRAMARCA BAJA</p>
+  <div class="top">
+    <div class="cab">
+      <h1>JAAPS JUNTA ADMINISTRADORA DE AGUA POTABLE</h1>
+      <p>SECTOR CARRIZALES - LACRAMARCA BAJA</p>
+    </div>
+    <div class="soles-box"><b>S/</b><span><?= number_format($monto, 2) ?></span></div>
   </div>
-  <div class="soles-box"><b>S/</b><span><?= number_format($monto, 2) ?></span></div>
 
   <div class="fila-titulo">
     <span class="pill"><?= e($r['titulo']) ?></span>

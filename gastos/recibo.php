@@ -33,7 +33,7 @@ $numero = str_pad((string)$g['id'], 6, '0', STR_PAD_LEFT);
 <body>
 <div class="toolbar">
   <a href="<?= APP_URL ?>/gastos/index.php">← Volver a gastos</a>
-  <span>Recibo de egreso Nº <?= e($numero) ?> · A6 en hoja A4</span>
+  <span>Recibo de egreso Nº <?= e($numero) ?> · A6 horizontal en hoja A4</span>
   <button onclick="window.print()">Imprimir</button>
 </div>
 <?php renderRecibos([[

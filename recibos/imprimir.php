@@ -55,7 +55,7 @@ $abonados = $stmt->fetchAll();
 <body>
 <div class="toolbar">
   <a href="<?= APP_URL ?>/recibos/index.php">← Volver</a>
-  <span><?= count($abonados) ?> recibos · <?= e($periodo['nombre']) ?> · A6 · 4 por hoja A4</span>
+  <span><?= count($abonados) ?> recibos · <?= e($periodo['nombre']) ?> · A6 horizontal · 4 por hoja A4</span>
   <button onclick="window.print()">Imprimir</button>
 </div>
 <?php if (!$abonados): ?>
