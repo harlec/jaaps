@@ -59,7 +59,7 @@ CREATE TABLE `abonados` (
   `email`             VARCHAR(100)    NULL,
   `numero_hijos`      TINYINT UNSIGNED NOT NULL DEFAULT 0,
   `fecha_inscripcion` DATE            NULL,
-  `estado`            ENUM('activo','inactivo','suspendido') NOT NULL DEFAULT 'activo',
+  `estado`            ENUM('activo','inactivo','cortado','suspension_temporal') NOT NULL DEFAULT 'activo',
   `observaciones`     TEXT            NULL,
   `creado_por`        INT UNSIGNED    NULL,
   `created_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,

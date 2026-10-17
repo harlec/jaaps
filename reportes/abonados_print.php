@@ -194,7 +194,8 @@ $qsVolver = http_build_query(['periodo_id' => $periodoId, 'estado' => $estado, '
     .badge.no   { background: #fee2e2; color: #dc2626; }
     .badge.activo     { background: #dcfce7; color: #15803d; }
     .badge.inactivo   { background: #f3f4f6; color: #6b7280; }
-    .badge.suspendido { background: #fee2e2; color: #dc2626; }
+    .badge.cortado { background: #fee2e2; color: #dc2626; }
+    .badge.suspension_temporal { background: #fef3c7; color: #b45309; }
 
     /* ── Pie de página ── */
     .doc-footer {

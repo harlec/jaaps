@@ -165,7 +165,8 @@ require_once __DIR__ . '/../includes/sidebar.php';
                   $estadoClases = [
                     'activo'     => 'bg-green-50 text-green-700',
                     'inactivo'   => 'bg-gray-100 text-gray-500',
-                    'suspendido' => 'bg-red-50 text-red-600',
+                    'cortado'    => 'bg-red-50 text-red-600',
+                    'suspension_temporal' => 'bg-amber-50 text-amber-700',
                   ];
                   $cls = $estadoClases[$a['estado']] ?? 'bg-gray-100 text-gray-500';
                 ?>

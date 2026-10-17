@@ -56,7 +56,8 @@ define('ESTADOS_CIVILES', [
 define('ESTADOS_ABONADO', [
     'activo'     => 'Activo',
     'inactivo'   => 'Inactivo',
-    'suspendido' => 'Suspendido',
+    'cortado'              => 'Cortado',
+    'suspension_temporal'  => 'Suspensión temporal',
 ]);
 
 // ── Métodos de pago ──────────────────────────────────────────

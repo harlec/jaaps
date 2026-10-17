@@ -63,7 +63,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
         <div class="flex items-center gap-3 flex-wrap">
           <h1 class="text-lg font-bold text-gray-800"><?= e($a['apellidos'] . ', ' . $a['nombres']) ?></h1>
           <?php
-            $cls = ['activo'=>'bg-green-50 text-green-700','inactivo'=>'bg-gray-100 text-gray-500','suspendido'=>'bg-red-50 text-red-600'];
+            $cls = ['activo'=>'bg-green-50 text-green-700','inactivo'=>'bg-gray-100 text-gray-500','cortado'=>'bg-red-50 text-red-600','suspension_temporal'=>'bg-amber-50 text-amber-700'];
           ?>
           <span class="<?= $cls[$a['estado']] ?? '' ?> text-xs font-medium px-2 py-0.5 rounded-full capitalize">
             <?= e(ESTADOS_ABONADO[$a['estado']] ?? $a['estado']) ?>
