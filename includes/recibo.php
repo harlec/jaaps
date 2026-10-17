@@ -78,15 +78,12 @@ function reciboCss(): string
     .linea .et { font-weight: 600; white-space: nowrap; }
     .linea .val { flex: 1; border-bottom: 1px solid #2b3a9e; min-height: 18px; padding: 0 3px 1px; color: #111; font-size: 13px; }
     .linea .val.corto { flex: 0 0 auto; min-width: 38mm; }
-    .linea.lineas2 { display: block; }
-    .linea.lineas2 .val { display: block; margin-top: 2.5mm; }
-    .linea.lineas2 .head { display: flex; align-items: flex-end; gap: 5px; }
 
     .cantidad { display: flex; align-items: center; gap: 5px; margin-bottom: 2.5mm; font-size: 13px; }
     .cantidad .et { font-weight: 600; white-space: nowrap; }
     .cantidad .val { flex: 1; border: 1px solid #2b3a9e; border-radius: 6px; padding: 4px 8px; color: #111; font-size: 11.5px; min-height: 24px; }
 
-    .pie { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 5mm; }
+    .pie { margin-top: auto; display: flex; align-items: flex-end; gap: 4mm; }
     .fechas { border: 1.5px solid #2b3a9e; border-radius: 9px; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 11px; }
     .fechas th, .fechas td { padding: 2px 10px; }
     .fechas thead th { border-bottom: 1.5px solid #2b3a9e; font-weight: 900; }
@@ -95,8 +92,15 @@ function reciboCss(): string
     .fechas td { color: #111; font-size: 14px; font-weight: bold; }
     .fechas td + td, .fechas thead th + th { border-left: 1px solid #2b3a9e; }
     .fechas td.venc { color: #b91c1c; }
-    .firma { width: 52mm; text-align: center; font-size: 11px; font-weight: 600; }
-    .firma div { border-top: 1px solid #2b3a9e; margin-bottom: 3px; }
+    .izq { display: flex; flex-direction: column; gap: 3mm; }
+    .firma { width: 100%; text-align: center; font-size: 10px; font-weight: 600; }
+    .firma div { border-top: 1px solid #2b3a9e; margin-bottom: 2px; }
+    .pago { flex: 1; font-size: 11px; line-height: 1.3; color: #111; align-self: center; }
+    .pago p + p { margin-top: 1.5mm; }
+    .pago b { color: #2b3a9e; }
+    .pago .pago-tit { font-weight: 900; color: #2b3a9e; font-size: 11.5px; letter-spacing: .5px; }
+    .qr { width: 26mm; height: 26mm; overflow: hidden; position: relative; flex: none; }
+    .qr img { position: absolute; width: 42.6mm; left: -8.2mm; top: -3.9mm; }
 
     @media print {
       body { background: #fff; }
@@ -143,10 +147,7 @@ function renderRecibo(array $r): void
 
   <div class="cantidad"><span class="et">La Cantidad de :</span><span class="val"><?= e(montoALetras($monto)) ?></span><span class="et">Soles</span></div>
 
-  <div class="linea lineas2">
-    <div class="head"><span class="et">Por Concepto de :</span><span class="val"><?= e($r['concepto']) ?></span></div>
-    <span class="val">&nbsp;</span>
-  </div>
+  <div class="linea"><span class="et">Por Concepto de :</span><span class="val"><?= e($r['concepto']) ?></span></div>
 
   <div class="linea">
     <span class="et">Mes de:</span><span class="val"><?= e($r['mes']) ?></span>
@@ -156,16 +157,26 @@ function renderRecibo(array $r): void
   </div>
 
   <div class="pie">
-    <table class="fechas">
-      <thead><tr><th></th><th>DIA</th><th>MES</th><th>AÑO</th></tr></thead>
-      <tbody>
-        <tr><th>EMISIÓN</th><td><?= date('d', $ts) ?></td><td><?= date('m', $ts) ?></td><td><?= date('Y', $ts) ?></td></tr>
-        <?php if (!empty($r['vencimiento'])): $tv = strtotime($r['vencimiento']); ?>
-        <tr><th>VENCE</th><td class="venc"><?= date('d', $tv) ?></td><td class="venc"><?= date('m', $tv) ?></td><td class="venc"><?= date('Y', $tv) ?></td></tr>
-        <?php endif; ?>
-      </tbody>
-    </table>
-    <div class="firma"><div></div>TESORERIA</div>
+    <div class="izq">
+      <table class="fechas">
+        <thead><tr><th></th><th>DIA</th><th>MES</th><th>AÑO</th></tr></thead>
+        <tbody>
+          <tr><th>EMISIÓN</th><td><?= date('d', $ts) ?></td><td><?= date('m', $ts) ?></td><td><?= date('Y', $ts) ?></td></tr>
+          <?php if (!empty($r['vencimiento'])): $tv = strtotime($r['vencimiento']); ?>
+          <tr><th>VENCE</th><td class="venc"><?= date('d', $tv) ?></td><td class="venc"><?= date('m', $tv) ?></td><td class="venc"><?= date('Y', $tv) ?></td></tr>
+          <?php endif; ?>
+        </tbody>
+      </table>
+      <div class="firma"><div></div>TESORERIA</div>
+    </div>
+    <?php if (!empty($r['vencimiento'])): ?>
+    <div class="pago">
+      <p class="pago-tit">FORMAS DE PAGO</p>
+      <p><b>Yape:</b> escanee el código QR.</p>
+      <p><b>Presencial:</b> el día de vencimiento, <?= date('d/m/Y', $tv) ?>, en el local de la JAAPS.</p>
+    </div>
+    <div class="qr"><img src="<?= APP_URL ?>/img/qr.jpeg" alt="QR Yape"></div>
+    <?php endif; ?>
   </div>
 </div></div></div>
     <?php
