@@ -143,7 +143,7 @@ function renderRecibo(array $r): void
     <div class="soles-box"><b>S/</b><span><?= number_format($monto, 2) ?></span></div>
   </div>
 
-  <div class="linea"><span class="et"><?= e($r['etiqueta']) ?></span><span class="val"><?= e($r['nombre']) ?></span></div>
+  <div class="linea"><span class="et"><?= e($r['etiqueta']) ?></span><span class="val"><?= e(mb_strtoupper($r['nombre'])) ?></span></div>
 
   <div class="cantidad"><span class="et">La Cantidad de :</span><span class="val"><?= e(montoALetras($monto)) ?></span><span class="et">Soles</span></div>
 
