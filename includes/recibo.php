@@ -62,24 +62,24 @@ function reciboCss(): string
     .hoja:last-child { page-break-after: auto; break-after: auto; }
     .recibo { width: 148.5mm; height: 105mm; padding: 4mm; }
     .marco { height: 100%; border: 1.5px solid #2b3a9e; border-radius: 8px; padding: 2px; }
-    .marco-int { height: 100%; border: 1px solid #2b3a9e; border-radius: 6px; padding: 3mm 5mm 3mm; display: flex; flex-direction: column; }
+    .marco-int { height: 100%; border: 1px solid #2b3a9e; border-radius: 6px; padding: 2.5mm 5mm 2.5mm; display: flex; flex-direction: column; }
 
     .cab { text-align: center; line-height: 1.15; }
     .cab h1 { font-size: 17px; font-weight: 900; letter-spacing: -.4px; }
     .cab p  { font-size: 12px; font-weight: bold; margin-top: 2px; letter-spacing: .3px; }
 
-    .fila-titulo { display: flex; align-items: center; justify-content: space-between; margin: 2.5mm 0 3mm; }
+    .fila-titulo { display: flex; align-items: center; justify-content: space-between; margin: 1.5mm 0 2.5mm; }
     .pill { background: #2b3a9e; color: #fff; font-weight: bold; font-size: 18px; letter-spacing: 1px; padding: 4px 24px; border-radius: 14px; }
     .numero { color: #dc2626; font-family: 'Times New Roman', serif; font-size: 18px; font-weight: bold; }
     .soles-box { min-width: 36mm; border: 1.5px solid #2b3a9e; border-radius: 6px; padding: 3px 9px; font-size: 18px; font-weight: bold; display: flex; gap: 6px; color: #111; }
     .soles-box b { color: #2b3a9e; }
 
-    .linea { display: flex; align-items: flex-end; gap: 5px; margin-bottom: 2.5mm; font-size: 13px; }
+    .linea { display: flex; align-items: flex-end; gap: 5px; margin-bottom: 1.8mm; font-size: 13px; }
     .linea .et { font-weight: 600; white-space: nowrap; }
     .linea .val { flex: 1; border-bottom: 1px solid #2b3a9e; min-height: 18px; padding: 0 3px 1px; color: #111; font-size: 13px; }
     .linea .val.corto { flex: 0 0 auto; min-width: 38mm; }
 
-    .cantidad { display: flex; align-items: center; gap: 5px; margin-bottom: 2.5mm; font-size: 13px; }
+    .cantidad { display: flex; align-items: center; gap: 5px; margin-bottom: 1.8mm; font-size: 13px; }
     .cantidad .et { font-weight: 600; white-space: nowrap; }
     .cantidad .val { flex: 1; border: 1px solid #2b3a9e; border-radius: 6px; padding: 4px 8px; color: #111; font-size: 11.5px; min-height: 24px; }
 
@@ -92,7 +92,7 @@ function reciboCss(): string
     .fechas td { color: #111; font-size: 14px; font-weight: bold; }
     .fechas td + td, .fechas thead th + th { border-left: 1px solid #2b3a9e; }
     .fechas td.venc { color: #b91c1c; }
-    .izq { display: flex; flex-direction: column; gap: 3mm; }
+    .izq { display: flex; flex-direction: column; gap: 9mm; }
     .firma { width: 100%; text-align: center; font-size: 10px; font-weight: 600; }
     .firma div { border-top: 1px solid #2b3a9e; margin-bottom: 2px; }
     .pago { flex: 1; font-size: 11px; line-height: 1.3; color: #111; align-self: center; }
