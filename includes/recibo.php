@@ -173,7 +173,7 @@ function renderRecibo(array $r): void
     <div class="pago">
       <p class="pago-tit">FORMAS DE PAGO</p>
       <p><b>Yape:</b> escanee el código QR.</p>
-      <p><b>Presencial:</b> el día de vencimiento, <?= date('d/m/Y', $tv) ?>, en el local de la JAAPS.</p>
+      <p><b>Presencial:</b> el día de vencimiento, <?= date('d/m/Y', $tv) ?>, en el local de la JAAPS, de 8:00 am a 1:00 pm.</p>
     </div>
     <div class="qr"><img src="<?= APP_URL ?>/img/qr.jpeg" alt="QR Yape"></div>
     <?php endif; ?>
