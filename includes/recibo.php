@@ -71,17 +71,17 @@ function reciboCss(): string
     .fila-titulo { display: flex; align-items: center; justify-content: space-between; margin: 1.5mm 0 2.5mm; }
     .pill { background: #2b3a9e; color: #fff; font-weight: bold; font-size: 18px; letter-spacing: 1px; padding: 4px 24px; border-radius: 14px; }
     .numero { color: #dc2626; font-family: 'Times New Roman', serif; font-size: 18px; font-weight: bold; }
-    .soles-box { min-width: 36mm; border: 1.5px solid #2b3a9e; border-radius: 6px; padding: 3px 9px; font-size: 18px; font-weight: bold; display: flex; gap: 6px; color: #111; }
+    .soles-box { min-width: 36mm; border: 1.5px solid #2b3a9e; border-radius: 6px; padding: 3px 9px; font-size: 18px; font-weight: bold; display: flex; gap: 6px; color: #1e2a8a; }
     .soles-box b { color: #2b3a9e; }
 
     .linea { display: flex; align-items: flex-end; gap: 5px; margin-bottom: 1.8mm; font-size: 13px; }
     .linea .et { font-weight: 600; white-space: nowrap; }
-    .linea .val { flex: 1; border-bottom: 1px solid #2b3a9e; min-height: 18px; padding: 0 3px 1px; color: #111; font-size: 13px; }
+    .linea .val { flex: 1; border-bottom: 1px solid #2b3a9e; min-height: 18px; padding: 0 3px 1px; color: #1e2a8a; font-size: 13px; }
     .linea .val.corto { flex: 0 0 auto; min-width: 38mm; }
 
     .cantidad { display: flex; align-items: center; gap: 5px; margin-bottom: 1.8mm; font-size: 13px; }
     .cantidad .et { font-weight: 600; white-space: nowrap; }
-    .cantidad .val { flex: 1; border: 1px solid #2b3a9e; border-radius: 6px; padding: 4px 8px; color: #111; font-size: 11.5px; min-height: 24px; }
+    .cantidad .val { flex: 1; border: 1px solid #2b3a9e; border-radius: 6px; padding: 4px 8px; color: #1e2a8a; font-size: 11.5px; min-height: 24px; }
 
     .pie { flex: 1; margin-top: 3mm; display: flex; align-items: stretch; gap: 4mm; }
     .fechas { border: 1.5px solid #2b3a9e; border-radius: 9px; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 11px; }
@@ -89,13 +89,13 @@ function reciboCss(): string
     .fechas thead th { border-bottom: 1.5px solid #2b3a9e; font-weight: 900; }
     .fechas tbody th { text-align: left; font-weight: 900; border-right: 1.5px solid #2b3a9e; padding-right: 12px; }
     .fechas tbody tr + tr > * { border-top: 1px solid #2b3a9e; }
-    .fechas td { color: #111; font-size: 14px; font-weight: bold; }
+    .fechas td { color: #1e2a8a; font-size: 14px; font-weight: bold; }
     .fechas td + td, .fechas thead th + th { border-left: 1px solid #2b3a9e; }
     .fechas td.venc { color: #b91c1c; }
     .izq { display: flex; flex-direction: column; justify-content: space-between; }
     .firma { width: 100%; text-align: center; font-size: 10px; font-weight: 600; }
     .firma div { border-top: 1px solid #2b3a9e; margin-bottom: 2px; }
-    .pago { flex: 1; font-size: 11px; line-height: 1.3; color: #111; align-self: flex-end; }
+    .pago { flex: 1; font-size: 11px; line-height: 1.3; color: #1e2a8a; align-self: flex-end; }
     .pago p + p { margin-top: 1.5mm; }
     .pago b { color: #2b3a9e; }
     .pago .pago-tit { font-weight: 900; color: #2b3a9e; font-size: 11.5px; letter-spacing: .5px; }
