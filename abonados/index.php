@@ -66,11 +66,11 @@ $pagados = ['1' => [], '2' => []];
 if ($abonados) {
     $ids = array_column($abonados, 'id');
     $ph  = implode(',', array_fill(0, count($ids), '?'));
-    $stP = $pdo->prepare("SELECT DISTINCT abonado_id FROM pagos WHERE periodo_id = ? AND abonado_id IN ($ph)");
+    $stP = $pdo->prepare("SELECT abonado_id, MAX(id) FROM pagos WHERE periodo_id = ? AND abonado_id IN ($ph) GROUP BY abonado_id");
     foreach ($periodoS as $sem => $per) {
         if (!$per) continue;
         $stP->execute(array_merge([$per['id']], $ids));
-        $pagados[$sem] = array_flip($stP->fetchAll(PDO::FETCH_COLUMN));
+        $pagados[$sem] = $stP->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 }
 
@@ -207,12 +207,14 @@ require_once __DIR__ . '/../includes/sidebar.php';
                   </a>
                   <?php foreach ($periodoS as $sem => $per): if (!$per || !$conceptoTarifa) continue; ?>
                   <?php if (isset($pagados[$sem][$a['id']])): ?>
-                  <span title="Semestre <?= $sem ?> <?= (int)$per['anio'] ?> pagado"
-                        class="p-1.5 rounded-lg text-emerald-500 cursor-default">
+                  <?php $esS2 = $sem === '2'; ?>
+                  <<?= $esS2 ? 'a href="' . APP_URL . '/recibos/individual.php?pago_id=' . (int)$pagados[$sem][$a['id']] . '"' : 'span' ?>
+                        title="Semestre <?= $sem ?> <?= (int)$per['anio'] ?> pagado<?= $esS2 ? ' · ver recibo JPG' : '' ?>"
+                        class="p-1.5 rounded-lg text-emerald-500 <?= $esS2 ? 'hover:bg-emerald-50' : 'cursor-default' ?>">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
-                  </span>
+                  </<?= $esS2 ? 'a' : 'span' ?>>
                   <?php else: ?>
                   <button type="button"
                           title="Pago Semestre <?= $sem ?> <?= (int)$per['anio'] ?>"
@@ -287,10 +289,11 @@ async function pagarSem(btn) {
         row.classList.remove('hover:bg-gray-50');
         row.classList.add('bg-emerald-50', 'hover:bg-emerald-100');
       }
-      btn.outerHTML = '<span title="Semestre ' + btn.dataset.sem + ' pagado" class="p-1.5 rounded-lg text-emerald-500 cursor-default">'
+      const tag = btn.dataset.sem === '2' ? 'a href="<?= APP_URL ?>/recibos/individual.php?pago_id=' + data.pago_id + '"' : 'span';
+      btn.outerHTML = '<' + tag + ' title="Semestre ' + btn.dataset.sem + ' pagado" class="p-1.5 rounded-lg text-emerald-500">'
         + '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">'
         + '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>'
-        + '</svg></span>';
+        + '</svg></' + tag.split(' ')[0] + '>';
     } else {
       showToast(data.error ?? 'No se pudo registrar el pago', 'error');
       btn.disabled = false;

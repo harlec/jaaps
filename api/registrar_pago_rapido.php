@@ -61,7 +61,7 @@ try {
         ':monto_total'    => $monto,
         ':registrado_por' => currentUser()['id'],
     ]);
-    echo json_encode(['success' => true, 'numero_recibo' => $numeroRecibo]);
+    echo json_encode(['success' => true, 'numero_recibo' => $numeroRecibo, 'pago_id' => (int)$pdo->lastInsertId()]);
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Error al registrar: ' . $e->getMessage()]);
