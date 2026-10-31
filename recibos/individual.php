@@ -6,7 +6,7 @@ requireLogin();
 $pdo = getDB();
 
 $stmt = $pdo->prepare("
-    SELECT p.*, a.nombres, a.apellidos, a.zona, c.nombre AS concepto, pc.nombre AS periodo
+    SELECT p.*, a.nombres, a.apellidos, a.zona, c.nombre AS concepto, pc.nombre AS periodo, pc.fecha_inicio, pc.fecha_fin, pc.monto_total AS monto_periodo
     FROM pagos p
     JOIN abonados a ON a.id = p.abonado_id
     JOIN conceptos c ON c.id = p.concepto_id
@@ -20,6 +20,12 @@ if (!$p) {
     redirect(APP_URL . '/abonados/index.php');
 }
 
+$mes = $p['periodo'] ?? '';
+if (!empty($p['fecha_inicio'])) {
+    $mes = MESES_ES[(int)date('n', strtotime($p['fecha_inicio']))] . ' - '
+         . MESES_ES[(int)date('n', strtotime($p['fecha_fin']))] . ' ' . date('Y', strtotime($p['fecha_fin']));
+}
+$monto = (float)($p['monto_periodo'] ?? $p['monto_total']);
 $nombre  = $p['apellidos'] . ', ' . $p['nombres'];
 $archivo = 'recibo_' . ($p['numero_recibo'] ?: $p['id']) . '.jpg';
 ?>
@@ -39,7 +45,7 @@ $archivo = 'recibo_' . ($p['numero_recibo'] ?: $p['id']) . '.jpg';
 <body>
 <div class="toolbar">
   <a href="<?= APP_URL ?>/abonados/index.php">← Volver</a>
-  <span><?= e($nombre) ?> · <?= e($p['periodo'] ?? '') ?> · CANCELADO</span>
+  <span><?= e($nombre) ?> · <?= e($mes) ?> · CANCELADO</span>
   <button id="btnJpg" type="button">Descargar JPG</button>
 </div>
 
@@ -49,9 +55,10 @@ $archivo = 'recibo_' . ($p['numero_recibo'] ?: $p['id']) . '.jpg';
       'etiqueta'    => 'Recibí del Sr.',
       'numero'      => (string)($p['numero_recibo'] ?? ''),
       'nombre'      => $nombre,
-      'monto'       => (float)$p['monto_total'],
-      'concepto'    => $p['concepto'],
-      'mes'         => $p['periodo'] ?? '',
+      'monto'       => $monto,
+      'concepto'    => 'Cuota de agua potable',
+      'mes'         => $mes,
+      'etiqueta_fecha' => 'PAGO',
       'sector'      => ZONAS[$p['zona']] ?? $p['zona'],
       'fecha'       => $p['fecha_pago'],
       'vencimiento' => null,

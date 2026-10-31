@@ -124,7 +124,8 @@ function renderRecibos(array $recibos): void
 /**
  * Dibuja un recibo con el formato del talonario.
  * $r: titulo (INGRESO/EGRESO), etiqueta (Recibí del Sr. / Pagado a), numero, nombre,
- *     monto, concepto, mes, sector (opcional), fecha (Y-m-d), vencimiento (Y-m-d|null)
+ *     monto, concepto, mes, sector (opcional), fecha (Y-m-d), vencimiento (Y-m-d|null),
+ *     etiqueta_fecha (opcional, por defecto EMISIÓN)
  */
 function renderRecibo(array $r): void
 {
@@ -161,7 +162,7 @@ function renderRecibo(array $r): void
       <table class="fechas">
         <thead><tr><th></th><th>DIA</th><th>MES</th><th>AÑO</th></tr></thead>
         <tbody>
-          <tr><th>EMISIÓN</th><td><?= date('d', $ts) ?></td><td><?= date('m', $ts) ?></td><td><?= date('Y', $ts) ?></td></tr>
+          <tr><th><?= e($r['etiqueta_fecha'] ?? 'EMISIÓN') ?></th><td><?= date('d', $ts) ?></td><td><?= date('m', $ts) ?></td><td><?= date('Y', $ts) ?></td></tr>
           <?php if (!empty($r['vencimiento'])): $tv = strtotime($r['vencimiento']); ?>
           <tr><th>VENCE</th><td class="venc"><?= date('d', $tv) ?></td><td class="venc"><?= date('m', $tv) ?></td><td class="venc"><?= date('Y', $tv) ?></td></tr>
           <?php endif; ?>
