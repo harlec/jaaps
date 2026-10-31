@@ -207,7 +207,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
                   </a>
                   <?php foreach ($periodoS as $sem => $per): if (!$per || !$conceptoTarifa) continue; ?>
                   <?php if (isset($pagados[$sem][$a['id']])): ?>
-                  <?php $esS2 = $sem === '2'; ?>
+                  <?php $esS2 = (string)$sem === '2'; ?>
                   <<?= $esS2 ? 'a href="' . APP_URL . '/recibos/individual.php?pago_id=' . (int)$pagados[$sem][$a['id']] . '"' : 'span' ?>
                         title="Semestre <?= $sem ?> <?= (int)$per['anio'] ?> pagado<?= $esS2 ? ' · ver recibo JPG' : '' ?>"
                         class="p-1.5 rounded-lg text-emerald-500 <?= $esS2 ? 'hover:bg-emerald-50' : 'cursor-default' ?>">
