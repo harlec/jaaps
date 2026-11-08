@@ -24,19 +24,24 @@ $whereZona = $zona !== '' ? "AND a.zona = ?" : '';
 $params    = [$periodoId];
 if ($zona !== '') $params[] = $zona;
 
+// Todos los abonados activos y en baja temporal, con marca de si ya pagaron el período
 $porZona = [];
-$total   = 0;
+$total   = 0; $pagaron = 0;
 if ($periodoActual) {
     $stmt = $pdo->prepare("
-        SELECT a.codigo, a.nombres, a.apellidos, a.zona
+        SELECT a.codigo, a.nombres, a.apellidos, a.zona, a.estado,
+               EXISTS (SELECT 1 FROM pagos p WHERE p.abonado_id = a.id AND p.periodo_id = ?) AS pagado
         FROM abonados a
-        WHERE a.estado = 'activo'
-          AND a.id NOT IN (SELECT p.abonado_id FROM pagos p WHERE p.periodo_id = ?)
+        WHERE a.estado IN ('activo','suspension_temporal')
           $whereZona
         ORDER BY a.zona, a.apellidos, a.nombres
     ");
     $stmt->execute($params);
-    foreach ($stmt->fetchAll() as $d) { $porZona[$d['zona']][] = $d; $total++; }
+    foreach ($stmt->fetchAll() as $d) {
+        $porZona[$d['zona']][] = $d;
+        $total++;
+        if ($d['pagado']) $pagaron++;
+    }
 }
 $monto = (float)($periodoActual['monto_total'] ?? 0);
 ?>
@@ -64,7 +69,10 @@ $monto = (float)($periodoActual['monto_total'] ?? 0);
     .n { width: 28px; color: #6b7280; font-size: 10px; }
     .cod { width: 62px; font-family: 'Courier New', monospace; font-size: 11px; }
     .chk { width: 52px; text-align: center; }
-    .chk span { display: inline-block; width: 15px; height: 15px; border: 1.5px solid #111; vertical-align: middle; }
+    .chk span { display: inline-block; width: 15px; height: 15px; border: 1.5px solid #111; vertical-align: middle; font-weight: 900; font-size: 13px; line-height: 12px; }
+    tr.ok td { background: #ecfdf5; }
+    .cobro { font-size: 11px; }
+    .obs { font-size: 10px; font-weight: bold; }
     .cobro { width: 90px; }
     .obs { width: 110px; }
     @media print {
@@ -78,7 +86,7 @@ $monto = (float)($periodoActual['monto_total'] ?? 0);
 <body>
 <div class="toolbar">
   <a href="deudores.php?periodo_id=<?= $periodoId ?>&zona=<?= urlencode($zona) ?>">← Volver</a>
-  <span><?= $total ?> deudores · lista de cobranza manual</span>
+  <span><?= $total ?> abonados · <?= $pagaron ?> pagaron · <?= $total - $pagaron ?> pendientes</span>
   <button onclick="window.print()">Imprimir</button>
 </div>
 
@@ -86,28 +94,30 @@ $monto = (float)($periodoActual['monto_total'] ?? 0);
   <h1>JAAPS – Lista de cobranza</h1>
   <p class="sub">
     <?= $periodoActual ? e($periodoActual['nombre']) : '' ?> · S/ <?= number_format($monto, 2) ?> por abonado ·
-    <?= $zona !== '' ? e(ZONAS[$zona] ?? $zona) : 'Todas las zonas' ?> · Impreso el <?= date('d/m/Y') ?>
+    <?= $zona !== '' ? e(ZONAS[$zona] ?? $zona) : 'Todas las zonas' ?> · Impreso el <?= date('d/m/Y') ?><br>
+    Pagaron: <?= $pagaron ?> · Pendientes: <?= $total - $pagaron ?> · Baja temporal se indica en Obs.
   </p>
 
   <?php if (!$porZona): ?>
-    <p style="text-align:center;padding:30px;color:#16a34a;font-weight:bold">✓ No hay deudores en este período.</p>
+    <p style="text-align:center;padding:30px;color:#16a34a;font-weight:bold">✓ No hay abonados.</p>
   <?php endif; ?>
 
   <?php foreach ($porZona as $z => $lista): $i = 0; ?>
   <div class="zona-title"><?= e(ZONAS[$z] ?? $z) ?> — <?= count($lista) ?></div>
   <table>
     <thead>
-      <tr><th class="n">#</th><th class="cod">Código</th><th>Apellidos y nombres</th><th class="chk">Pagó</th><th class="cobro">Monto S/</th><th class="obs">Obs.</th></tr>
+      <tr><th class="n">#</th><th class="cod">Código</th><th>Apellidos y nombres</th><th class="chk">Yape</th><th class="chk">Efectivo</th><th class="cobro">Monto S/</th><th class="obs">Obs.</th></tr>
     </thead>
     <tbody>
       <?php foreach ($lista as $d): $i++; ?>
-      <tr>
+      <tr class="<?= $d['pagado'] ? 'ok' : '' ?>">
         <td class="n"><?= $i ?></td>
         <td class="cod"><?= e($d['codigo']) ?></td>
         <td><strong><?= e(mb_strtoupper($d['apellidos'] . ', ' . $d['nombres'])) ?></strong></td>
+        <td class="chk"><span><?= $d['pagado'] ? 'X' : '' ?></span></td>
         <td class="chk"><span></span></td>
-        <td class="cobro"></td>
-        <td class="obs"></td>
+        <td class="cobro"><?= $d['pagado'] ? number_format($monto, 2) : '' ?></td>
+        <td class="obs"><?= $d['estado'] === 'suspension_temporal' ? 'Baja temporal' : '' ?></td>
       </tr>
       <?php endforeach; ?>
     </tbody>

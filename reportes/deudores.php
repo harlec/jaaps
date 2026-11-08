@@ -129,7 +129,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
         <a href="<?= APP_URL ?>/reportes/deudores_cobranza.php?periodo_id=<?= $periodoId ?>&zona=<?= urlencode($zona) ?>"
            target="_blank"
            class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
-          Lista de cobranza (nombres)
+          Lista de cobranza
         </a>
         <a href="<?= APP_URL ?>/reportes/deudores_print.php?periodo_id=<?= $periodoId ?>&zona=<?= urlencode($zona) ?>"
            target="_blank"
