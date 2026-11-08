@@ -13,11 +13,11 @@ $periodos = $pdo->query(
      ORDER BY anio DESC, semestre"
 )->fetchAll();
 
-// Período seleccionado — por defecto el semestre 1 2026
+// Período seleccionado — por defecto el semestre en curso
 $periodoId = (int)($_GET['periodo_id'] ?? 0);
 if ($periodoId === 0) {
     foreach ($periodos as $p) {
-        if ((int)$p['anio'] === 2026 && $p['semestre'] === '1') {
+        if ((int)$p['anio'] === (int)date('Y') && $p['semestre'] === (date('n') >= 7 ? '2' : '1')) {
             $periodoId = (int)$p['id'];
             break;
         }
@@ -68,6 +68,47 @@ foreach ($deudores as $d) {
     $z = $d['zona'];
     $resumenZona[$z] = ($resumenZona[$z] ?? 0) + 1;
 }
+
+// Ingresos y morosidad por zona (todas las zonas, sin importar el filtro de zona)
+$statsZona = [];
+$totCobrado = 0.0; $totPagaron = 0; $totActivos = 0;
+if ($periodoActual) {
+    foreach (ZONAS as $k => $v) {
+        $statsZona[$k] = ['activos' => 0, 'pagaron' => 0, 'cobrado' => 0.0];
+    }
+    foreach ($pdo->query("SELECT zona, COUNT(*) c FROM abonados WHERE estado = 'activo' GROUP BY zona") as $r) {
+        if (isset($statsZona[$r['zona']])) $statsZona[$r['zona']]['activos'] = (int)$r['c'];
+    }
+    $stz = $pdo->prepare("
+        SELECT a.zona, COUNT(DISTINCT p.abonado_id) pagaron, COALESCE(SUM(p.monto_total), 0) cobrado
+        FROM pagos p JOIN abonados a ON a.id = p.abonado_id
+        WHERE p.periodo_id = ?
+        GROUP BY a.zona
+    ");
+    $stz->execute([$periodoId]);
+    foreach ($stz as $r) {
+        if (isset($statsZona[$r['zona']])) {
+            $statsZona[$r['zona']]['pagaron'] = (int)$r['pagaron'];
+            $statsZona[$r['zona']]['cobrado'] = (float)$r['cobrado'];
+        }
+    }
+    $stD = $pdo->prepare("
+        SELECT zona, COUNT(*) c FROM abonados
+        WHERE estado = 'activo' AND id NOT IN (SELECT abonado_id FROM pagos WHERE periodo_id = ?)
+        GROUP BY zona
+    ");
+    $stD->execute([$periodoId]);
+    $debenZona = $stD->fetchAll(PDO::FETCH_KEY_PAIR);
+    foreach ($statsZona as $k => &$z) {
+        $z['deben']     = (int)($debenZona[$k] ?? 0);
+        $z['esperado']  = $z['activos'] * (float)$periodoActual['monto_total'];
+        $z['pct']       = $z['esperado'] > 0 ? min(100, $z['cobrado'] / $z['esperado'] * 100) : 0;
+        $totCobrado += $z['cobrado']; $totPagaron += $z['pagaron']; $totActivos += $z['activos'];
+    }
+    unset($z);
+}
+$totEsperado = $totActivos * (float)($periodoActual['monto_total'] ?? 0);
+$pctGlobal   = $totEsperado > 0 ? min(100, $totCobrado / $totEsperado * 100) : 0;
 
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/sidebar.php';
@@ -121,7 +162,82 @@ require_once __DIR__ . '/../includes/sidebar.php';
 
     <?php if ($periodoActual): ?>
 
-    <!-- Tarjetas resumen -->
+    <!-- Ingresos del período -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4">
+        <p class="text-xs text-gray-400 font-medium">Ingreso del semestre</p>
+        <p class="text-2xl font-bold text-emerald-600 mt-1">S/ <?= number_format($totCobrado, 2) ?></p>
+        <p class="text-xs text-gray-400 mt-0.5">de S/ <?= number_format($totEsperado, 2) ?> esperados</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4">
+        <p class="text-xs text-gray-400 font-medium">Abonados que pagaron</p>
+        <p class="text-2xl font-bold text-emerald-600 mt-1"><?= $totPagaron ?></p>
+        <p class="text-xs text-gray-400 mt-0.5">de <?= $totActivos ?> activos</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4">
+        <p class="text-xs text-gray-400 font-medium">Abonados que deben</p>
+        <p class="text-2xl font-bold text-red-600 mt-1"><?= array_sum(array_column($statsZona, 'deben')) ?></p>
+        <p class="text-xs text-gray-400 mt-0.5">S/ <?= number_format(max(0, $totEsperado - $totCobrado), 2) ?> por cobrar</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4">
+        <p class="text-xs text-gray-400 font-medium">Cobranza</p>
+        <p class="text-2xl font-bold text-gray-700 mt-1"><?= number_format($pctGlobal, 1) ?>%</p>
+        <div class="h-1.5 bg-gray-100 rounded-full mt-2"><div class="h-1.5 bg-emerald-500 rounded-full" style="width:<?= number_format($pctGlobal, 1, '.', '') ?>%"></div></div>
+      </div>
+    </div>
+
+    <!-- Ingresos por zona -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-3 border-b border-gray-100">
+        <p class="text-sm font-semibold text-gray-700">Ingresos por zona – <?= e($periodoActual['nombre']) ?></p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+            <tr>
+              <th class="px-5 py-3 text-left">Zona</th>
+              <th class="px-5 py-3 text-right">Activos</th>
+              <th class="px-5 py-3 text-right">Pagaron</th>
+              <th class="px-5 py-3 text-right">Deben</th>
+              <th class="px-5 py-3 text-right">Cobrado</th>
+              <th class="px-5 py-3 text-right">Por cobrar</th>
+              <th class="px-5 py-3 text-left w-40">Cobranza</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            <?php foreach ($statsZona as $k => $z): ?>
+            <tr>
+              <td class="px-5 py-3 font-medium text-gray-800"><?= e(ZONAS[$k]) ?></td>
+              <td class="px-5 py-3 text-right text-gray-600"><?= $z['activos'] ?></td>
+              <td class="px-5 py-3 text-right text-emerald-600"><?= $z['pagaron'] ?></td>
+              <td class="px-5 py-3 text-right text-red-600"><?= $z['deben'] ?></td>
+              <td class="px-5 py-3 text-right font-semibold text-emerald-600">S/ <?= number_format($z['cobrado'], 2) ?></td>
+              <td class="px-5 py-3 text-right text-red-600">S/ <?= number_format(max(0, $z['esperado'] - $z['cobrado']), 2) ?></td>
+              <td class="px-5 py-3">
+                <div class="flex items-center gap-2">
+                  <div class="flex-1 h-1.5 bg-gray-100 rounded-full"><div class="h-1.5 bg-emerald-500 rounded-full" style="width:<?= number_format($z['pct'], 1, '.', '') ?>%"></div></div>
+                  <span class="text-xs text-gray-500 w-10 text-right"><?= number_format($z['pct'], 0) ?>%</span>
+                </div>
+              </td>
+            </tr>
+            <?php endforeach; ?>
+          </tbody>
+          <tfoot class="bg-gray-50 border-t border-gray-200 font-semibold text-gray-700">
+            <tr>
+              <td class="px-5 py-3">Total</td>
+              <td class="px-5 py-3 text-right"><?= $totActivos ?></td>
+              <td class="px-5 py-3 text-right text-emerald-600"><?= $totPagaron ?></td>
+              <td class="px-5 py-3 text-right text-red-600"><?= array_sum(array_column($statsZona, 'deben')) ?></td>
+              <td class="px-5 py-3 text-right text-emerald-600">S/ <?= number_format($totCobrado, 2) ?></td>
+              <td class="px-5 py-3 text-right text-red-600">S/ <?= number_format(max(0, $totEsperado - $totCobrado), 2) ?></td>
+              <td class="px-5 py-3 text-xs text-gray-500"><?= number_format($pctGlobal, 1) ?>%</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Deudores (según filtro) -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4">
         <p class="text-xs text-gray-400 font-medium">Total deudores</p>
